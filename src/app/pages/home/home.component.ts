@@ -1,13 +1,15 @@
-import { Component, OnInit, computed, signal, effect, inject, Injector } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, computed, signal, effect, inject, Injector } from '@angular/core';
 import { RouterLinkWithHref, RouterLinkActive, ActivatedRoute } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import {Task} from './../../models/task.model';
+import { HeaderComponent } from "../../domains/shared/header/header.component";
+import { FooterComponent } from "../../domains/shared/footer/footer.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLinkWithHref, RouterLinkActive, ReactiveFormsModule],
+  imports: [ReactiveFormsModule, HeaderComponent, FooterComponent],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
@@ -15,12 +17,17 @@ export class HomeComponent implements OnInit {
   tasks = signal<Task[]>([]);
   injector = inject(Injector);
 
-  filter = signal('all');
-  
+  filter = signal<'all' | 'pending' | 'completed'>('all');
+
   constructor(private route: ActivatedRoute) { 
     this.route.url.subscribe(url => {
-      const path = url[0]?.path || 'all';
-      this.filter.set(path);
+      const path = url[0]?.path;
+  
+      if (path === 'all' || path === 'pending' || path === 'completed') {
+        this.filter.set(path); 
+      } else {
+        this.filter.set('all'); 
+      }
     });
   }
 
@@ -57,16 +64,6 @@ export class HomeComponent implements OnInit {
       this.tasks.set(tasks);
     }
     this.trackTask();
-  }
-
-  changeHandler(){
-    if(this.newTaskCtrl.valid){
-      const value = this.newTaskCtrl.value.trim();
-      if(value !== ''){
-        this.addTask(value);
-      this.newTaskCtrl.setValue('');
-      }
-    }
   }
 
   trackTask(){
@@ -144,11 +141,7 @@ export class HomeComponent implements OnInit {
     this.filter.set(filter);
   }
 
-  hasCompletedTasks(): boolean {
-    return (this.taskByFilter() ?? []).some(task => task.completed);
-  }
-
-  clearCompletedTasks(){
-    this.tasks.update((tasks) => tasks.filter((task) => task.completed !== true));
+  clearCompletedTasks(updatedTasks: { id: number; title: string; completed: boolean }[]){
+    this.tasks.set(updatedTasks);
   }
 }
