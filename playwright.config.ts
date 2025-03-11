@@ -14,7 +14,7 @@ const config: PlaywrightTestConfig = {
   reporter: 'list',
   use: {
     actionTimeout: 0,
-    baseURL: 'http://localhost:8080',
+    baseURL: 'http://localhost:4200',
     trace: 'on-first-retry',
   },
   projects: [
@@ -28,7 +28,8 @@ const config: PlaywrightTestConfig = {
   outputDir: "test-results/",
   webServer: {
     command: 'npm run start:prod',
-    port: 8080,
+    port: 4200,
+    reuseExistingServer: true, // No intenta levantar un servidor nuevo si ya está corriendo
   },
 };
 
