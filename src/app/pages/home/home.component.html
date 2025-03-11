@@ -23,12 +23,46 @@
       </section>
     }
     <!-- This footer should be hidden by default and shown when there are todos -->
-     @if (tasks().length > 0){
+    <footer class="footer">
+      <!-- This should be `0 items left` by default -->
+      <span class="todo-count"><strong>{{taskByFilter().length}}</strong>
+        @if (taskByFilter().length > 1) {
+          <span> items</span>
+        } @else {
+          item
+        }
+      left</span>
+      <!-- Remove this if you don't implement routing -->
+      <ul class="filters">
+        <li>
+          <a routerLink="/" 
+          [routerLinkActiveOptions]="{exact: true}"
+          routerLinkActive=""
+          [class.selected]="filter() === 'all'">All</a>
+        </li>
+        <li>
+          <a routerLink="/pending" 
+          routerLinkActive=""
+          [class.selected]="filter() === 'pending'">Pending</a>
+        </li>
+        <li>
+          <a routerLink="/completed" 
+          routerLinkActive=""
+          [class.selected]="filter() === 'completed'">Completed</a>
+        </li>
+      </ul>        
+      <!-- Hidden if no completed items are left ↓ -->
+      @if (hasCompletedTasks()){
+        <button class="clear-completed" (click)="clearCompletedTasks()">Clear completed</button>
+      }
+    </footer>
+     <!-- @if (tasks().length > 0){
       <app-footer 
       [tasks]="tasks()" 
       [filter]="filter()"
+      (tasksUpdated)="taskByFilter()"
       (filterChange)="changeFilter($event)"
       (tasksUpdated)="clearCompletedTasks($event)"></app-footer>  
-     }
+     } -->
   </div>
 </section>
