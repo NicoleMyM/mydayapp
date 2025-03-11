@@ -1,15 +1,14 @@
-import { Component, OnInit, EventEmitter, Output, computed, signal, effect, inject, Injector } from '@angular/core';
+import { Component, OnInit, computed, signal, effect, inject, Injector } from '@angular/core';
 import { RouterLinkWithHref, RouterLinkActive, ActivatedRoute } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import {Task} from './../../models/task.model';
 import { HeaderComponent } from "../../domains/shared/header/header.component";
-import { FooterComponent } from "../../domains/shared/footer/footer.component";
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [ReactiveFormsModule, HeaderComponent, FooterComponent],
+  imports: [ReactiveFormsModule, HeaderComponent, RouterLinkWithHref, RouterLinkActive],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
@@ -141,7 +140,12 @@ export class HomeComponent implements OnInit {
     this.filter.set(filter);
   }
 
-  clearCompletedTasks(updatedTasks: { id: number; title: string; completed: boolean }[]){
+  hasCompletedTasks(): boolean {
+    return (this.taskByFilter() ?? []).some(task => task.completed);
+  }
+
+  clearCompletedTasks(){
+    const updatedTasks = this.taskByFilter().filter(task => !task.completed);
     this.tasks.set(updatedTasks);
   }
 }
